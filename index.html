@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>RaidCode – Code to Moon</title>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <style>body { background: #000; color: #00ff41; font-family: monospace; } .raid-btn { background: #ff6b35; color: white; padding: 15px; border: none; cursor: pointer; }</style>
+</head>
+<body>
+    <h1>RaidCode: Fork & Earn $RAID</h1>
+    <p>US Degen Hub: GitHub raids for Solana memes. Connect wallet to start.</p>
+    <button class="raid-btn" onclick="connectWallet()">Connect Phantom</button>
+    <div id="bounties">
+        <h2>Open Raids</h2>
+        <ul>
+            <li>Fork & Add Meme Bot – 500 $RAID</li>
+            <li>Build NASDAQ Predictor – 1k $RAID</li>
+        </ul>
+    </div>
+    <script>
+        function connectWallet() { if (window.solana) window.solana.connect().then(() => alert('Connected! Fork repo now.')); else alert('Get Phantom.'); }
+    </script>
+</body>
+</html>
