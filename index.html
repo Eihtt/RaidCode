@@ -1,23 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>RaidCode – Code to Moon</title>
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <style>body { background: #000; color: #00ff41; font-family: monospace; } .raid-btn { background: #ff6b35; color: white; padding: 15px; border: none; cursor: pointer; }</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaidCode – US Degen GitHub Raids</title>
+    <!-- CDN: React, Solana Wallet Adapter for US Wallets -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@1.87.6/lib/index.iife.min.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-base@0.9.23/dist/umd/index.min.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-react@0.15.35/dist/umd/index.min.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-wallets@0.19.32/dist/umd/index.min.js"></script>
+    <style>
+        body { background: linear-gradient(135deg, #000, #0a0a1a); color: #00ff41; font-family: 'Courier New', monospace; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; font-size: 2.5em; text-shadow: 0 0 10px #00ff41; margin-bottom: 20px; }
+        .wallet-btn { background: #ff6b35; color: white; border: none; padding: 15px 30px; cursor: pointer; font-size: 1.1em; border-radius: 5px; margin: 10px; }
+        .wallet-btn:hover { box-shadow: 0 0 15px #ff6b35; }
+        .bounties { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }
+        .bounty-card { background: rgba(0,0,0,0.8); border: 1px solid #00ff41; padding: 15px; border-radius: 8px; transition: transform 0.3s; }
+        .bounty-card:hover { transform: scale(1.05); }
+        .bounty-title { color: #ff6b35; font-size: 1.3em; margin-bottom: 10px; }
+        .bounty-reward { font-weight: bold; color: #00ff41; }
+        .submit-form { margin-top: 20px; padding: 15px; background: rgba(255,107,53,0.1); border-radius: 5px; }
+        .image-gallery { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .image-gallery img { width: 100px; height: 100px; object-fit: cover; border: 1px solid #00ff41; border-radius: 5px; cursor: pointer; }
+        @media (max-width: 768px) { .bounties { grid-template-columns: 1fr; } h1 { font-size: 2em; } }
+    </style>
 </head>
 <body>
-    <h1>RaidCode: Fork & Earn $RAID</h1>
-    <p>US Degen Hub: GitHub raids for Solana memes. Connect wallet to start.</p>
-    <button class="raid-btn" onclick="connectWallet()">Connect Phantom</button>
-    <div id="bounties">
-        <h2>Open Raids</h2>
-        <ul>
-            <li>Fork & Add Meme Bot – 500 $RAID</li>
-            <li>Build NASDAQ Predictor – 1k $RAID</li>
-        </ul>
-    </div>
-    <script>
-        function connectWallet() { if (window.solana) window.solana.connect().then(() => alert('Connected! Fork repo now.')); else alert('Get Phantom.'); }
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { Connection, PublicKey } = solanaWeb3;
+        const { WalletAdapterNetwork } = solanaWalletAdapterBase;
+        const { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+        const { PhantomWalletAdapter, BackpackWalletAdapter } = solanaWalletAdapterWallets; // US Favorites
+
+        // Wallet Setup (US Wallets)
+        const network = WalletAdapterNetwork.Mainnet;
+        const wallets = [new PhantomWalletAdapter(), new BackpackWalletAdapter()];
+        const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+
+        // Bounties Data (US-Focused, Using Your Images)
+        const bounties = [
+            { id: 1, title: "NYSE Pump Predictor Bot", desc: "Build Solana bot for S&P signals – Wall St degens needed", reward: 2000, imageId: 1 },
+            { id: 2, title: "GitHub Meme Fork Tool", desc: "Auto-fork script with AI meme gen", reward: 1000, imageId: 2 },
+            { id: 3, title: "Robinhood Mock Raider", desc: "Simulate US trades for $RAID staking", reward: 1500, imageId: 3 }
+        ];
+
+        // Image Paths from Attachments (Relative to /assets)
+        const images = [1,2,3,4,5,6,7].map(id => `/assets/image.jpg?${id}`); // Adjust if renamed
+
+        function RaidApp() {
+            const [wallet, setWallet] = useState(null);
+            const [prLink, setPrLink] = useState('');
+
+            const connectWallet = async () => {
+                if (window.solana && window.solana.isPhantom) {
+                    try {
+                        const resp = await window.solana.connect();
+                        setWallet(resp.publicKey.toString().slice(0,8) + '...');
+                        alert('Connected! Raid a bounty – submit PR link.');
+                    } catch (err) { alert('Connection failed – try Backpack.'); }
+                } else if (window.backpack) {
+                    // Backpack Stub
+                    setWallet('Backpack Connected');
+                } else {
+                    alert('Install Phantom or Backpack for US Solana.');
+                }
+            };
+
+            const submitRaid = (e) => {
+                e.preventDefault();
+                if (!wallet) return alert('Connect wallet first.');
+                if (!prLink) return alert('Add your GitHub PR link.');
+                alert(`Raid Submitted! PR: ${prLink} – Review for $RAID payout.`);
+                setPrLink('');
+            };
+
+            return (
+                <div className="container">
+                    <h1>RaidCode US Dashboard – Fork to Earn $RAID</h1>
+                    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                        {!wallet ? (
+                            <button className="wallet-btn" onClick={connectWallet}>Connect US Wallet (Phantom/Backpack)</button>
+                        ) : (
+                            <p>Wallet: {wallet} – Ready to Raid!</p>
+                        )}
+                    </div>
+
+                    <div className="bounties">
+                        {bounties.map(bounty => (
+                            <div key={bounty.id} className="bounty-card">
+                                <div className="bounty-title">{bounty.title}</div>
+                                <p>{bounty.desc}</p>
+                                <div className="bounty-reward">Reward: {bounty.reward} $RAID</div>
+                                <img src={images[bounty.imageId - 1]} alt={`Bounty ${bounty.id}`} style={{ width: '100%', height: '150px', objectFit: 'cover', marginTop: '10px' }} />
+                                <button className="wallet-btn" style={{ width: '100%', marginTop: '10px' }} onClick={() => window.open('https://github.com/Eihtt/RaidCode/fork', '_blank')}>Fork Repo</button>
+                            </div>
+                        ))}
+                    </div>
+
+                    <form className="submit-form" onSubmit={submitRaid}>
+                        <h3>Submit Your Raid (PR Link)</h3>
+                        <input type="url" value={prLink} onChange={(e) => setPrLink(e.target.value)} placeholder="https://github.com/Eihtt/RaidCode/pull/1" style={{ width: '100%', padding: '10px', marginBottom: '10px', background: '#000', color: '#00ff41', border: '1px solid #00ff41' }} required />
+                        <button type="submit" className="wallet-btn">Submit for $RAID Review</button>
+                    </form>
+
+                    <div className="image-gallery">
+                        <h3>Your Attached Images (Bounty Thumbs)</h3>
+                        {images.slice(0,4).map((img, i) => ( // First 4 for demo
+                            <img key={i} src={img} alt={`Attached ${i+1}`} onClick={() => alert(`Use Image ${i+1} for Bounty ${i+1}`)} />
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Render (CDN React for Pages)
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ConnectionProvider endpoint="https://api.mainnet-beta.solana.com"><WalletProvider wallets={wallets} autoConnect>{<RaidApp />}</WalletProvider></ConnectionProvider>);
     </script>
 </body>
 </html>
